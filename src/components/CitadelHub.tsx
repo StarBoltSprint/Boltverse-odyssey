@@ -1,5 +1,6 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { Castle, Star, Users, Volume2 } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Castle, Music, Music2, Star, Users, Volume2 } from "lucide-react";
+import { createCitadelTheme, type CitadelTheme } from "@/game/citadel-theme";
 
 type Props = {
   onHall: () => void;
@@ -13,6 +14,8 @@ export function CitadelHub({ onHall, onConstellation, onLand }: Props) {
   const [note, setNote] = useState<string | null>(null);
   const [live, setLive] = useState(false);
   const [reduce, setReduce] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const themeRef = useRef<CitadelTheme | null>(null);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -20,6 +23,39 @@ export function CitadelHub({ onHall, onConstellation, onLand }: Props) {
     sync();
     mq.addEventListener("change", sync);
     return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    const theme = createCitadelTheme();
+    themeRef.current = theme;
+    setMuted(theme.muted());
+    return () => {
+      theme.stop();
+      theme.dispose();
+      themeRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    function wake(ev?: Event) {
+      const t = themeRef.current;
+      if (!t) return;
+      t.unlock();
+      const el = ev?.target as HTMLElement | null;
+      if (el?.closest?.(".citadel-song")) return;
+      if (!t.muted()) t.start();
+    }
+    window.addEventListener("pointerdown", wake, { capture: true });
+    window.addEventListener("keydown", wake);
+    const onVis = () => {
+      if (document.visibilityState === "visible") wake();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      window.removeEventListener("pointerdown", wake, { capture: true });
+      window.removeEventListener("keydown", wake);
+      document.removeEventListener("visibilitychange", onVis);
+    };
   }, []);
 
   useEffect(() => {
@@ -36,11 +72,32 @@ export function CitadelHub({ onHall, onConstellation, onLand }: Props) {
 
   function sendHowl() {
     setHowl(true);
+    themeRef.current?.howl();
     setNote("Howl sent. The citadel answers.");
   }
 
+  function toggleSong() {
+    const t = themeRef.current;
+    if (!t) return;
+    t.unlock();
+    if (t.playing()) {
+      t.setMuted(true);
+      t.stop();
+      setMuted(true);
+      return;
+    }
+    t.setMuted(false);
+    setMuted(false);
+    t.start();
+  }
+
   return (
-    <section className="citadel" data-howl={howl ? "true" : undefined} aria-label="Thunderwolf Citadel">
+    <section
+      className="citadel"
+      data-howl={howl ? "true" : undefined}
+      data-song={muted ? undefined : "on"}
+      aria-label="Thunderwolf Citadel"
+    >
       <img className="citadel-art" src="/citadel/hub.jpg" alt="" hidden={live} />
       {!reduce && (
         <video
@@ -55,8 +112,12 @@ export function CitadelHub({ onHall, onConstellation, onLand }: Props) {
           onPlaying={() => setLive(true)}
         />
       )}
+      <div className="citadel-aurora" aria-hidden />
+      <div className="citadel-bloom" aria-hidden />
       <div className="citadel-veil" aria-hidden />
       <div className="citadel-sparks" aria-hidden>
+        <i />
+        <i />
         <i />
         <i />
         <i />
@@ -70,6 +131,15 @@ export function CitadelHub({ onHall, onConstellation, onLand }: Props) {
         <p className="citadel-kicker">Boltverse</p>
         <h1 className="citadel-title">Thunderwolf Citadel</h1>
         <p className="citadel-sub">Pack HQ</p>
+        <button
+          type="button"
+          className="citadel-song"
+          aria-pressed={!muted}
+          aria-label={muted ? "Play song" : "Mute song"}
+          onClick={toggleSong}
+        >
+          {muted ? <Music2 strokeWidth={2.4} /> : <Music strokeWidth={2.4} />}
+        </button>
       </header>
 
       <div className="citadel-rail citadel-rail-l">

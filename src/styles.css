@@ -3714,10 +3714,33 @@ img.citadel-art {
 video.citadel-live {
   z-index: 0;
   animation: none;
+  filter: contrast(1.06) saturate(1.1);
 }
 .citadel[data-howl="true"] video.citadel-live {
-  filter: brightness(1.18) saturate(1.12);
-  transition: filter 180ms ease-out;
+  filter: brightness(1.06) saturate(1.08) contrast(1.06);
+}
+.citadel-aurora {
+  position: absolute;
+  inset: -8%;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 28% at 50% 18%, rgba(126, 232, 242, 0.12), transparent 70%),
+    radial-gradient(ellipse 40% 30% at 50% 58%, rgba(212, 180, 106, 0.1), transparent 72%);
+  animation: citadel-aurora 18s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+}
+.citadel-bloom {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 28%;
+  height: 48%;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 62%, rgba(247, 213, 106, 0.16), transparent 68%);
+  animation: citadel-bloom 16s ease-in-out infinite;
+  mix-blend-mode: screen;
 }
 .citadel-veil {
   position: absolute;
@@ -3742,7 +3765,7 @@ video.citadel-live {
   background: #f7d56a;
   box-shadow: 0 0 8px 2px color-mix(in oklab, var(--color-gold) 70%, white);
   opacity: 0;
-  animation: citadel-spark 3.4s ease-in-out infinite;
+  animation: citadel-spark 6.8s ease-in-out infinite;
 }
 .citadel-sparks i:nth-child(1) {
   left: 16%;
@@ -3776,6 +3799,18 @@ video.citadel-live {
   top: 72%;
   animation-delay: 1.8s;
 }
+.citadel-sparks i:nth-child(7) {
+  left: 38%;
+  top: 34%;
+  width: 3px;
+  height: 3px;
+  animation-delay: 2.6s;
+}
+.citadel-sparks i:nth-child(8) {
+  left: 70%;
+  top: 46%;
+  animation-delay: 3.1s;
+}
 .citadel-howl {
   position: absolute;
   left: 50%;
@@ -3794,16 +3829,50 @@ video.citadel-live {
   z-index: 2;
   margin: calc(env(safe-area-inset-top) + 12px) auto 0;
   width: min(86%, 22rem);
-  padding: 10px 16px 12px;
+  padding: 10px 44px 12px;
   text-align: center;
   border-radius: 18px;
-  background: linear-gradient(180deg, #3a3228 0%, #1a1612 100%);
+  background:
+    linear-gradient(180deg, rgba(247, 213, 106, 0.16), transparent 40%),
+    linear-gradient(180deg, #3a3228 0%, #1a1612 100%);
   box-shadow:
     0 0 0 2px #f0c24a,
     0 0 0 5px #6a4a18,
     0 6px 0 #3a2810,
-    0 14px 28px rgba(0, 0, 0, 0.42);
-  animation: citadel-banner-glow 3.2s ease-in-out infinite;
+    0 14px 28px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(247, 213, 106, 0.35);
+}
+.citadel-song {
+  appearance: none;
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  margin-top: -18px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #3a3228, #16120e);
+  color: var(--color-gold);
+  box-shadow:
+    0 0 0 1px #f0c24a,
+    0 3px 0 #3a2810;
+}
+.citadel-song svg {
+  width: 18px;
+  height: 18px;
+}
+.citadel-song:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 0 0 1px #f0c24a,
+    0 1px 0 #3a2810;
+}
+.citadel-song[aria-pressed="true"] {
+  color: #1a140c;
+  background: linear-gradient(180deg, #f7d56a, #d4b46a);
 }
 .citadel-kicker {
   margin: 0;
@@ -3868,7 +3937,7 @@ video.citadel-live {
     0 0 0 2px #f0c24a,
     0 0 0 4px #6a4a18,
     0 5px 0 #3a2810;
-  animation: citadel-bob 2.8s ease-in-out infinite;
+  animation: citadel-bob 5.6s ease-in-out infinite;
 }
 .citadel-rail-l .citadel-door:nth-child(2) .citadel-door-ico {
   animation-delay: 0.45s;
@@ -4061,7 +4130,7 @@ video.citadel-live {
   }
   40%,
   55% {
-    opacity: 1;
+    opacity: 0.55;
     transform: scale(1);
   }
 }
@@ -4084,22 +4153,21 @@ video.citadel-live {
     transform: translateX(130%);
   }
 }
-@keyframes citadel-banner-glow {
+@keyframes citadel-aurora {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 0.75;
+  }
+}
+@keyframes citadel-bloom {
   0%,
   100% {
-    box-shadow:
-      0 0 0 2px #f0c24a,
-      0 0 0 5px #6a4a18,
-      0 6px 0 #3a2810,
-      0 14px 28px rgba(0, 0, 0, 0.42);
+    opacity: 0.45;
   }
   50% {
-    box-shadow:
-      0 0 0 2px #f7d56a,
-      0 0 0 5px #6a4a18,
-      0 6px 0 #3a2810,
-      0 14px 28px rgba(0, 0, 0, 0.42),
-      0 0 22px color-mix(in oklab, var(--color-gold) 45%, transparent);
+    opacity: 0.7;
   }
 }
 @media (min-width: 880px) {
@@ -4138,6 +4206,8 @@ video.citadel-live {
   .citadel-door-ico,
   .citadel-land::after,
   .citadel-banner,
+  .citadel-aurora,
+  .citadel-bloom,
   .citadel-door:active .citadel-door-ico,
   .citadel-land:active {
     animation: none;
