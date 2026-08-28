@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ARTIFACTS } from "@/game/artifacts";
 import {
   connectBot,
   fetchBotSession,
@@ -8,9 +9,13 @@ import {
 
 const TICK_MS = 2000;
 const EMPTY: SessionPayload = { session: null, den: null, landables: [] };
+/** Only Core Heart is open in artifacts.ts. One tap. Guest, not own. */
+const OPEN_LANDABLE = ARTIFACTS.find((a) => a.open)?.id ?? "core-heart";
 
-function guestLandable(payload: SessionPayload) {
-  return payload.landables.find((l) => l.landable && !l.owned) ?? null;
+function circuitLandable(payload: SessionPayload) {
+  return (
+    payload.landables.find((l) => l.artifact_id === OPEN_LANDABLE && l.landable && !l.owned) ?? null
+  );
 }
 
 function actionLine(payload: SessionPayload): string {
@@ -24,17 +29,13 @@ function actionLine(payload: SessionPayload): string {
   return payload.den ? `staying in ${payload.den.name}` : "staying in Pack HQ";
 }
 
-function travelLabel(name: string) {
-  return name === "Core Heart" ? "Walk the Circuit" : name;
-}
-
 /** GROK_BOT_SLIT — live pane on the Citadel door. Real /api/bot session. Not a takeover. */
 export function BotSlit() {
   const [payload, setPayload] = useState<SessionPayload>(EMPTY);
   const [busy, setBusy] = useState(false);
   const session = payload.session;
   const guest = Boolean(session && session.mode === "travel");
-  const landable = guestLandable(payload);
+  const landable = circuitLandable(payload);
   const canTravel = Boolean(session && session.mode === "stay" && landable);
 
   useEffect(() => {
@@ -101,7 +102,7 @@ export function BotSlit() {
           </p>
           {canTravel && landable ? (
             <button type="button" className="citadel-slit-travel" onClick={() => void onTravel()}>
-              {travelLabel(landable.name)}
+              Walk the Circuit
             </button>
           ) : null}
         </>
