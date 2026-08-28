@@ -81,7 +81,7 @@ export function GrokBotSlit() {
             <strong>{row.botName || "Grok Bot"}</strong>
             <em>
               {actionLine(row)}
-              {guest ? <span className="citadel-slit-guest">guest</span> : null}
+              {guest ? <span className="citadel-slit-guest"> · guest</span> : null}
             </em>
           </p>
           {canTravel ? (
