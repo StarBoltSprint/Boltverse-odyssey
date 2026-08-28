@@ -504,15 +504,17 @@ export function CircuitApp() {
         )}
 
         {playing && !logOpen && !joinOpen && !moreOpen && !hud.toast && (
-          <p className="hud-slim-duty">
-            {bot.session?.activity
-              || (loadChangePreview()
-                ? `PREVIEW · ${loadChangePreview()?.author}: ${loadChangePreview()?.wish.slice(0, 48)}`
-                : loadPreview()
-                  ? `PREVIEW · ${loadPreview()?.author}'s Bolt brain · not live`
-                  : walkLine)}
-          </p>
-          {bot.session ? <BotSlit payload={bot} onChange={setBot} /> : null}
+          <>
+            <p className="hud-slim-duty">
+              {bot.session?.activity
+                || (loadChangePreview()
+                  ? `PREVIEW · ${loadChangePreview()?.author}: ${loadChangePreview()?.wish.slice(0, 48)}`
+                  : loadPreview()
+                    ? `PREVIEW · ${loadPreview()?.author}'s Bolt brain · not live`
+                    : walkLine)}
+            </p>
+            {bot.session ? <BotSlit payload={bot} onChange={setBot} /> : null}
+          </>
         )}
 
         <div className="flex-1 relative pointer-events-none min-h-0">
