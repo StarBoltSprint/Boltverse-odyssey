@@ -3978,7 +3978,7 @@ video.citadel-live {
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  padding: 0 18px calc(env(safe-area-inset-bottom) + 12px);
+  padding: 0 18px calc(env(safe-area-inset-bottom) + 62px);
 }
 .citadel-land {
   appearance: none;
@@ -4143,7 +4143,7 @@ video.citadel-live {
   position: absolute;
   left: 16px;
   right: 16px;
-  bottom: calc(148px + env(safe-area-inset-bottom));
+  bottom: calc(198px + env(safe-area-inset-bottom));
   z-index: 3;
   margin: 0 auto;
   max-width: 22rem;
@@ -4327,7 +4327,7 @@ video.citadel-live {
     min-height: 44px;
   }
   .citadel-note {
-    bottom: calc(132px + env(safe-area-inset-bottom));
+    bottom: calc(182px + env(safe-area-inset-bottom));
   }
 }
 @media (prefers-reduced-motion: reduce) {
