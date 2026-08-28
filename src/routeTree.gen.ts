@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiBotRouteImport } from './routes/api/bot'
 import { Route as ApiRtcRouteImport } from './routes/api/rtc'
 import { Route as ApiVisionsRouteImport } from './routes/api/visions'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBotRoute = ApiBotRouteImport.update({
+  id: '/api/bot',
+  path: '/api/bot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiRtcRoute = ApiRtcRouteImport.update({
@@ -31,30 +37,34 @@ const ApiVisionsRoute = ApiVisionsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/bot': typeof ApiBotRoute
   '/api/rtc': typeof ApiRtcRoute
   '/api/visions': typeof ApiVisionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/bot': typeof ApiBotRoute
   '/api/rtc': typeof ApiRtcRoute
   '/api/visions': typeof ApiVisionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/bot': typeof ApiBotRoute
   '/api/rtc': typeof ApiRtcRoute
   '/api/visions': typeof ApiVisionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/rtc' | '/api/visions'
+  fullPaths: '/' | '/api/bot' | '/api/rtc' | '/api/visions'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/rtc' | '/api/visions'
-  id: '__root__' | '/' | '/api/rtc' | '/api/visions'
+  to: '/' | '/api/bot' | '/api/rtc' | '/api/visions'
+  id: '__root__' | '/' | '/api/bot' | '/api/rtc' | '/api/visions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiBotRoute: typeof ApiBotRoute
   ApiRtcRoute: typeof ApiRtcRoute
   ApiVisionsRoute: typeof ApiVisionsRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot': {
+      id: '/api/bot'
+      path: '/api/bot'
+      fullPath: '/api/bot'
+      preLoaderRoute: typeof ApiBotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/rtc': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiBotRoute: ApiBotRoute,
   ApiRtcRoute: ApiRtcRoute,
   ApiVisionsRoute: ApiVisionsRoute,
 }
