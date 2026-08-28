@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Castle, Music, Music2, Star, Users, Volume2 } from "lucide-react";
 import { createCitadelTheme, type CitadelTheme } from "@/game/citadel-theme";
+import { GrokBotSlit } from "./GrokBotSlit";
 
 type Props = {
   onHall: () => void;
@@ -154,6 +155,8 @@ export function CitadelHub({ onHall, onConstellation, onLand }: Props) {
         <button type="button" className="citadel-land" onClick={onLand}>
           Land
         </button>
+        {/* GROK_BOT_SLIT — live pane under LAND. Not a modal. */}
+        <GrokBotSlit />
       </footer>
 
       {note && (
