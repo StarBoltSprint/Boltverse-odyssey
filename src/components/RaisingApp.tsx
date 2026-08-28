@@ -4,7 +4,6 @@ import type { RaisingHandle, RaisingHud } from "@/game/raising-engine";
 import type { SkyHandle, SkyHud } from "@/game/constellation-engine";
 import { fetchBotSession, type SessionPayload } from "@/game/bot-session";
 import { ArtifactHall } from "./ArtifactHall";
-import { BotSlit } from "./BotSlit";
 import { CitadelHub } from "./CitadelHub";
 import { RaisingDock } from "./RaisingDock";
 
@@ -223,7 +222,6 @@ export function RaisingApp() {
               <p className="hud-slim-duty">{bot.session.activity}</p>
             ) : null}
           </div>
-          {bot.session ? <BotSlit payload={bot} onChange={setBot} /> : null}
         </div>
       )}
 

@@ -1,47 +1,112 @@
-import type { SessionPayload } from "@/game/bot-session";
-import { setBotSession } from "@/game/bot-session";
+import { useEffect, useState } from "react";
+import { ARTIFACTS } from "@/game/artifacts";
+import {
+  connectBot,
+  fetchBotSession,
+  setBotSession,
+  type SessionPayload,
+} from "@/game/bot-session";
 
-/** Stay / Travel chips in the existing HUD slit. Not a new screen. */
-export function BotSlit({
-  payload,
-  onChange,
-}: {
-  payload: SessionPayload;
-  onChange: (next: SessionPayload) => void;
-}) {
+const TICK_MS = 2000;
+const EMPTY: SessionPayload = { session: null, den: null, landables: [] };
+/** Only Core Heart is open in artifacts.ts. One tap. Guest, not own. */
+const OPEN_LANDABLE = ARTIFACTS.find((a) => a.open)?.id ?? "core-heart";
+
+function circuitLandable(payload: SessionPayload) {
+  return (
+    payload.landables.find((l) => l.artifact_id === OPEN_LANDABLE && l.landable && !l.owned) ?? null
+  );
+}
+
+function actionLine(payload: SessionPayload): string {
   const session = payload.session;
-  if (!session) return null;
-  const guests = payload.landables.filter((l) => !l.owned);
+  if (!session) return "idle";
+  if (session.activity) return session.activity;
+  if (session.mode === "travel") {
+    const land = payload.landables.find((l) => l.artifact_id === session.current_artifact_id);
+    return land ? `visiting ${land.name}` : "traveling";
+  }
+  return payload.den ? `staying in ${payload.den.name}` : "staying in Pack HQ";
+}
 
-  async function stay() {
-    onChange(await setBotSession("stay", payload.den?.artifact_id));
+/** GROK_BOT_SLIT — live pane on the Citadel door. Real /api/bot session. Not a takeover. */
+export function BotSlit() {
+  const [payload, setPayload] = useState<SessionPayload>(EMPTY);
+  const [busy, setBusy] = useState(false);
+  const session = payload.session;
+  const guest = Boolean(session && session.mode === "travel");
+  const landable = circuitLandable(payload);
+  const canTravel = Boolean(session && session.mode === "stay" && landable);
+
+  useEffect(() => {
+    let stop = false;
+    const tick = () => {
+      void fetchBotSession()
+        .then((next) => {
+          if (!stop) setPayload(next);
+        })
+        .catch(() => {});
+    };
+    tick();
+    const id = window.setInterval(tick, TICK_MS);
+    return () => {
+      stop = true;
+      window.clearInterval(id);
+    };
+  }, []);
+
+  async function onConnect() {
+    setBusy(true);
+    try {
+      const next = await connectBot();
+      if (next.oauth_url) {
+        window.location.assign(next.oauth_url);
+        return;
+      }
+      if (!next.error) setPayload(next);
+    } finally {
+      setBusy(false);
+    }
   }
 
-  async function travel(id?: string) {
-    onChange(await setBotSession("travel", id));
+  async function onTravel() {
+    if (!landable) return;
+    const next = await setBotSession("travel", landable.artifact_id);
+    if (!next.error) setPayload(next);
   }
 
   return (
-    <div className="bot-slit" aria-label="Grok Bot stay or travel">
-      <button
-        type="button"
-        className="hud-slim-textbtn"
-        data-on={session.mode === "stay" ? "true" : undefined}
-        onClick={() => void stay()}
-      >
-        Stay
-      </button>
-      {guests.slice(0, 5).map((land) => (
-        <button
-          key={land.artifact_id}
-          type="button"
-          className="hud-slim-textbtn"
-          data-on={session.mode === "travel" && session.current_artifact_id === land.artifact_id ? "true" : undefined}
-          onClick={() => void travel(land.artifact_id)}
-        >
-          {land.name}
-        </button>
-      ))}
-    </div>
+    <aside
+      className="citadel-slit"
+      data-grok-bot-slit
+      data-mode={session ? session.mode : "off"}
+      data-guest={guest ? "true" : undefined}
+      aria-label="Grok Bot"
+    >
+      {!session ? (
+        <>
+          <span className="citadel-slit-who">Grok Bot</span>
+          <button type="button" className="citadel-slit-go" disabled={busy} onClick={() => void onConnect()}>
+            {busy ? "…" : "Connect"}
+          </button>
+        </>
+      ) : (
+        <>
+          <span className="citadel-slit-dot" aria-hidden />
+          <p className="citadel-slit-live">
+            <strong>{session.bot_name || "Grok Bot"}</strong>
+            <em>
+              {actionLine(payload)}
+              {guest ? <span className="citadel-slit-guest"> · guest</span> : null}
+            </em>
+          </p>
+          {canTravel && landable ? (
+            <button type="button" className="citadel-slit-travel" onClick={() => void onTravel()}>
+              Walk the Circuit
+            </button>
+          ) : null}
+        </>
+      )}
+    </aside>
   );
 }

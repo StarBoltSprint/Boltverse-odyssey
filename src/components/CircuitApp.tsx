@@ -32,7 +32,6 @@ import { loadChain, needleDeg, talkWitness } from "@/game/play";
 import { bindAgentHandle, installWebMcp } from "@/game/webmcp";
 import { fetchBotSession, type SessionPayload } from "@/game/bot-session";
 import { GrokBotSignIn } from "./GrokBotSignIn";
-import { BotSlit } from "./BotSlit";
 import { BotRelay } from "./BotRelay";
 import { BrainSheet } from "./BrainSheet";
 import { SubmitChangeSheet } from "./SubmitChangeSheet";
@@ -504,17 +503,14 @@ export function CircuitApp() {
         )}
 
         {playing && !logOpen && !joinOpen && !moreOpen && !hud.toast && (
-          <>
-            <p className="hud-slim-duty">
-              {bot.session?.activity
-                || (loadChangePreview()
-                  ? `PREVIEW · ${loadChangePreview()?.author}: ${loadChangePreview()?.wish.slice(0, 48)}`
-                  : loadPreview()
-                    ? `PREVIEW · ${loadPreview()?.author}'s Bolt brain · not live`
-                    : walkLine)}
-            </p>
-            {bot.session ? <BotSlit payload={bot} onChange={setBot} /> : null}
-          </>
+          <p className="hud-slim-duty">
+            {bot.session?.activity
+              || (loadChangePreview()
+                ? `PREVIEW · ${loadChangePreview()?.author}: ${loadChangePreview()?.wish.slice(0, 48)}`
+                : loadPreview()
+                  ? `PREVIEW · ${loadPreview()?.author}'s Bolt brain · not live`
+                  : walkLine)}
+          </p>
         )}
 
         <div className="flex-1 relative pointer-events-none min-h-0">

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { connectBot, disconnectBot, fetchBotSession, type SessionPayload } from "@/game/bot-session";
-import { BotSlit } from "./BotSlit";
 
 export function GrokBotSignIn({
   onClose,
@@ -79,7 +78,6 @@ export function GrokBotSignIn({
                 {session.bot_name} · {session.mode === "stay" ? "Stay" : "Travel"}
               </p>
               <p className="mt-1 text-sm text-muted">{session.activity}</p>
-              <BotSlit payload={payload} onChange={publish} />
               <div className="mt-5 flex flex-col gap-2">
                 <button type="button" className="hud-chip h-11 rounded-lg border border-border text-fg" disabled={busy} onClick={() => void disconnect()}>
                   Disconnect
