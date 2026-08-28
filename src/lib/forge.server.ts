@@ -1,4 +1,5 @@
 import { MAX_WISH, sanitizeRemix, type RemixWorld } from "@/game/forged";
+import { rejectApiKeyPayload } from "@/lib/bot/rules.ts";
 
 const SYSTEM = `You remix Luminous Circuit (Boltverse Odyssey Year 0 toy citadel).
 Output ONLY NDJSON, one object per line. No markdown.
@@ -23,17 +24,47 @@ function json(body: unknown, status: number) {
   });
 }
 
+/** If a Grok Bot session is live, remix writes follow stay/travel ownership. No player API keys. */
+async function rejectBotWrite(
+  request: Request,
+  body: { artifact_id?: string },
+): Promise<Response | null> {
+  try {
+    const { getSessionUser } = await import("@/lib/auth/verify.server");
+    const authz = request.headers.get("authorization");
+    const bearer = authz?.toLowerCase().startsWith("bearer ") ? authz.slice(7).trim() : undefined;
+    const user = await getSessionUser(bearer);
+    if (!user) return null;
+    const { getSql } = await import("@/lib/db");
+    const { createSqlStore } = await import("@/lib/bot/sql-store.server.ts");
+    const { createBotService } = await import("@/lib/bot/service.ts");
+    const bot = createBotService(createSqlStore(await getSql()));
+    const snap = await bot.session(user.id);
+    if (!snap.ok || !snap.session) return null;
+    const artifactId = body.artifact_id || snap.session.current_artifact_id || undefined;
+    const write = await bot.forge(user.id, { op: "iterate", artifact_id: artifactId });
+    if (!write.ok) return json({ error: write.error }, write.status);
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export async function handleForge(request: Request) {
   if (request.method !== "POST") return json({ error: "POST only" }, 405);
   const apiKey = process.env.XAI_API_KEY;
   if (!apiKey) return json({ error: "The forge is cold. Turn on SpaceXAI APIs when you publish." }, 503);
 
-  let body: { wish?: string } = {};
+  let body: { wish?: string; artifact_id?: string } = {};
   try {
-    body = (await request.json()) as { wish?: string };
+    body = (await request.json()) as { wish?: string; artifact_id?: string };
   } catch {
     return json({ error: "Bad howl." }, 400);
   }
+  const keyErr = rejectApiKeyPayload(body);
+  if (keyErr) return json({ error: keyErr }, 400);
+  const blocked = await rejectBotWrite(request, body);
+  if (blocked) return blocked;
   const wish = String(body.wish ?? "")
     .replace(/\s+/g, " ")
     .trim()

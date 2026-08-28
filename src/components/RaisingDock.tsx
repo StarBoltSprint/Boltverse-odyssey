@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { loadNames } from "@/game/civic";
 import { loadChanges } from "@/game/city-change";
+import type { SessionPayload } from "@/game/bot-session";
 import { GrokBotSignIn } from "./GrokBotSignIn";
 import { SubmitChangeSheet } from "./SubmitChangeSheet";
 
 type Tab = "map" | "lineage" | "remix" | "bot" | null;
 
-export function RaisingDock({ lookX, lookZ }: { lookX: number; lookZ: number }) {
+export function RaisingDock({
+  lookX,
+  lookZ,
+  onBotSession,
+}: {
+  lookX: number;
+  lookZ: number;
+  onBotSession?: (next: SessionPayload) => void;
+}) {
   const [tab, setTab] = useState<Tab>(null);
 
   function toggle(next: Tab) {
@@ -97,7 +106,7 @@ export function RaisingDock({ lookX, lookZ }: { lookX: number; lookZ: number }) 
         <SubmitChangeSheet engine={null} px={lookX} pz={lookZ} onClose={() => setTab(null)} />
       )}
 
-      {tab === "bot" && <GrokBotSignIn onClose={() => setTab(null)} />}
+      {tab === "bot" && <GrokBotSignIn onClose={() => setTab(null)} onSession={onBotSession} />}
     </>
   );
 }

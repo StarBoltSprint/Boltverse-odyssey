@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ApiBotRouteImport } from './routes/api/bot'
 import { Route as ApiForgeRouteImport } from './routes/api/forge'
 import { Route as ApiRtcRouteImport } from './routes/api/rtc'
 import { Route as ApiVisionsRouteImport } from './routes/api/visions'
@@ -24,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBotRoute = ApiBotRouteImport.update({
+  id: '/api/bot',
+  path: '/api/bot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiForgeRoute = ApiForgeRouteImport.update({
@@ -50,6 +56,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/api/bot': typeof ApiBotRoute
   '/api/forge': typeof ApiForgeRoute
   '/api/rtc': typeof ApiRtcRoute
   '/api/visions': typeof ApiVisionsRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/api/bot': typeof ApiBotRoute
   '/api/forge': typeof ApiForgeRoute
   '/api/rtc': typeof ApiRtcRoute
   '/api/visions': typeof ApiVisionsRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/api/bot': typeof ApiBotRoute
   '/api/forge': typeof ApiForgeRoute
   '/api/rtc': typeof ApiRtcRoute
   '/api/visions': typeof ApiVisionsRoute
@@ -75,14 +84,27 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/login' | '/api/forge' | '/api/rtc' | '/api/visions' | '/api/auth/$'
+    | '/'
+    | '/login'
+    | '/api/bot'
+    | '/api/forge'
+    | '/api/rtc'
+    | '/api/visions'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/login' | '/api/forge' | '/api/rtc' | '/api/visions' | '/api/auth/$'
+    | '/'
+    | '/login'
+    | '/api/bot'
+    | '/api/forge'
+    | '/api/rtc'
+    | '/api/visions'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/'
     | '/login'
+    | '/api/bot'
     | '/api/forge'
     | '/api/rtc'
     | '/api/visions'
@@ -92,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  ApiBotRoute: typeof ApiBotRoute
   ApiForgeRoute: typeof ApiForgeRoute
   ApiRtcRoute: typeof ApiRtcRoute
   ApiVisionsRoute: typeof ApiVisionsRoute
@@ -112,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bot': {
+      id: '/api/bot'
+      path: '/api/bot'
+      fullPath: '/api/bot'
+      preLoaderRoute: typeof ApiBotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/forge': {
@@ -148,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  ApiBotRoute: ApiBotRoute,
   ApiForgeRoute: ApiForgeRoute,
   ApiRtcRoute: ApiRtcRoute,
   ApiVisionsRoute: ApiVisionsRoute,

@@ -2749,6 +2749,26 @@ body {
   font-size: 0.8125rem;
   font-weight: 500;
 }
+.bot-slit {
+  pointer-events: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 12px 0;
+}
+.bot-slit .hud-slim-textbtn {
+  min-height: 36px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.bot-slit .hud-slim-textbtn[data-on="true"] {
+  color: var(--color-accent);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-accent) 40%, transparent);
+}
+
 .raising-toast {
   margin: 12px 16px 0;
   padding: 10px 14px;

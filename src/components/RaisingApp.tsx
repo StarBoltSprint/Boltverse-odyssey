@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { ARTIFACTS, type ArtifactId } from "@/game/artifacts";
 import type { RaisingHandle, RaisingHud } from "@/game/raising-engine";
 import type { SkyHandle, SkyHud } from "@/game/constellation-engine";
+import { fetchBotSession, type SessionPayload } from "@/game/bot-session";
 import { ArtifactHall } from "./ArtifactHall";
+import { BotSlit } from "./BotSlit";
 import { CitadelHub } from "./CitadelHub";
 import { RaisingDock } from "./RaisingDock";
 
@@ -20,6 +22,11 @@ export function RaisingApp() {
   const [skyHud, setSkyHud] = useState<SkyHud>(SKY_EMPTY);
   const [bootError, setBootError] = useState<string | null>(null);
   const [muted, setMuted] = useState(false);
+  const [bot, setBot] = useState<SessionPayload>({ session: null, den: null, landables: [] });
+
+  useEffect(() => {
+    void fetchBotSession().then(setBot);
+  }, []);
 
   useEffect(() => {
     if (place === "citadel" || place === "hall") return;
@@ -212,11 +219,15 @@ export function RaisingApp() {
           </header>
           <div className="flex-1 relative min-h-0">
             {hud.toast && <p className="raising-toast">{hud.toast}</p>}
+            {bot.session ? (
+              <p className="hud-slim-duty">{bot.session.activity}</p>
+            ) : null}
           </div>
+          {bot.session ? <BotSlit payload={bot} onChange={setBot} /> : null}
         </div>
       )}
 
-      {playing && <RaisingDock lookX={hud.lookX} lookZ={hud.lookZ} />}
+      {playing && <RaisingDock lookX={hud.lookX} lookZ={hud.lookZ} onBotSession={setBot} />}
 
       {bootError && (
         <div className="raising-gate">
