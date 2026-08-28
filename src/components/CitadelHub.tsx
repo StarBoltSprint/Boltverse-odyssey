@@ -123,7 +123,6 @@ export function CitadelHub({ onHall, onConstellation, onLand }: Props) {
         <i />
         <i />
         <i />
-        <i />
       </div>
       {howl && <div className="citadel-howl" aria-hidden />}
 
