@@ -1,0 +1,1 @@
+function e(e){let t=e.replace(/^\//,``);return`/`.endsWith(`/`)?`/${t}`:`//${t}`}export{e as t};
