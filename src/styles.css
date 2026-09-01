@@ -9964,3 +9964,20 @@ canvas.citadel-proc {
 
 
 
+
+/* Citadel film hall — Samsung hits + one ENTER */
+.citadel-hit,
+.walk-hit {
+  background: rgb(0 0 0 / 0.02);
+}
+.walk-hit-enter {
+  left: 6%;
+  top: 82%;
+  width: 88%;
+  height: 16%;
+  border-radius: 999px;
+  z-index: 40;
+}
+.relic-frame {
+  z-index: 32;
+}

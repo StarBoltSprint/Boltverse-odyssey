@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { RaisingApp } from "@/components/RaisingApp";
+import { CitadelApp } from "@/components/citadel-app";
 
 export const Route = createFileRoute("/")({
   ssr: false,
-  component: RaisingApp,
+  component: Home,
 });
+
+function Home() {
+  return <CitadelApp />;
+}

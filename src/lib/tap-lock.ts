@@ -1,32 +1,29 @@
-/** Ignore leftover Enter/Land presses across a page change. */
 let frozenUntil = 0;
 
-export function freezeTaps(ms = 1600) {
-  frozenUntil = Math.max(frozenUntil, performance.now() + ms);
+export function freezeTaps(ms: number) {
+  frozenUntil = performance.now() + ms;
 }
 
 export function tapsFrozen() {
   return performance.now() < frozenUntil;
 }
 
-/** Arm only after the finger that opened this page lifts. */
-export function armAfterLift(onArm: () => void, fallbackMs = 1800) {
+/** Arm after the incoming tap is fully dead — never on that tap's own lift/click. */
+export function armAfterLift(fn: () => void) {
   let done = false;
-  let t = 0;
-  const arm = () => {
+  const fire = () => {
     if (done) return;
     done = true;
     window.clearTimeout(t);
-    freezeTaps(500);
-    t = window.setTimeout(onArm, 280);
+    window.removeEventListener("pointerdown", onDown, true);
+    fn();
   };
-  window.addEventListener("pointerup", arm, { once: true });
-  window.addEventListener("pointercancel", arm, { once: true });
-  t = window.setTimeout(arm, fallbackMs);
+  const onDown = () => fire();
+  window.addEventListener("pointerdown", onDown, true);
+  const t = window.setTimeout(fire, 260);
   return () => {
     done = true;
     window.clearTimeout(t);
-    window.removeEventListener("pointerup", arm);
-    window.removeEventListener("pointercancel", arm);
+    window.removeEventListener("pointerdown", onDown, true);
   };
 }
